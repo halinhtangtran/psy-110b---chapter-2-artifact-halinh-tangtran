@@ -1,0 +1,98 @@
+# Programming project 02: DNA Identification
+# Ha Linh Tang Tran
+
+
+def str_count(sequence, str_type):
+    '''This function counts the repetition times of each str
+        Parameter: 
+            sequence: [str] str sequences provided in the assignment
+            str_type: [str] different str types - AGAT, AATG, TATC
+        Return:
+            max_str_count: [int] the maximum repetition times of each str type
+    '''
+    max_str_count = 0
+    str_count = 0
+
+    while sequence:
+        # compare the first 4 characters to str if they match count go up by 1
+        if str_type == sequence[0:4]:
+            str_count += 1
+            # remove the 4 characters
+            sequence = sequence[4:]
+
+        # if do not match set the max count before set it back to zero
+        else:
+            max_str_count = max(max_str_count, str_count)
+            str_count = 0
+            # remove the current first chracter in sequence
+            sequence = sequence[1:]
+
+    # if the last iteration was a match to gene type, set the max to max count
+    max_str_count = max(max_str_count, str_count)
+    return max_str_count
+
+
+def match_result(sequence_counts, dna_data):
+    '''This function matches the people with the str sequences
+        Parameter: 
+            sequence_counts: [str] is the str count
+            dna_data: [dict] contains the dna_data given in the assignment
+        Return:
+            key: matching results
+    '''
+    #comparing the dna_data and the str in the sequences
+    for key, value in dna_data.items():
+        # if match, return person's name
+        if sequence_counts == value:
+            return key
+
+    # if do not match return no match
+    return "No Match"
+
+
+def main():
+    '''This function creates the dictionary, open and read files 
+        and provides test cases with the dna_data file
+        Parameter: 
+            none
+        Return:
+            none
+    '''      
+
+    dna_data = {}
+
+    # read dna_data file and split it into rows
+    dna_file = open("dna_data.csv.txt", 'r')
+    rows = dna_file.read().split("\n")
+    row1 = rows[0].split(",")
+
+    str_types = row1[1:]
+
+    for row in rows[1:]:
+        name_str_rows = row.split(",")
+        # map each person name to the count respectively
+        dna_data[name_str_rows[0]] = [int(i) for i in name_str_rows[1:]]
+
+    for file in ["sequence1.txt", "sequence2.txt", "sequence3.txt", "sequence4.txt"]:
+        # read sequence files
+        fo = open(file, 'r') 
+        sequence = fo.read()
+
+        # count str for each type
+        counts = []
+        for str_type in str_types:
+            counts.append(str_count(sequence, str_type))
+        
+        # match the person with the count
+        person = match_result(counts, dna_data)
+
+        # print match result
+        print(file, counts, person)
+
+
+if __name__ == '__main__':
+    main()
+        
+
+
+
