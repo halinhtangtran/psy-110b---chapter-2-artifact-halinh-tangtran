@@ -1,0 +1,99 @@
+def play_board(missed_guess, correct_guess, word_to_guess):
+    hangman = ['''
+    +---+
+        |
+        |
+        |
+       ===''', '''
+    +---+
+    O   |
+        |
+        |
+       ===''', '''
+    +---+
+    O   |
+    |   |
+        |
+       ===''', '''
+    +---+
+    O   |
+   /|   |
+        |
+       ===''', '''
+    +---+
+    O   |
+   /|\  |
+        |
+       ===''', '''
+    +---+
+    O   |
+   /|\  |
+   /    |
+       ===''', '''
+    +---+
+    O   |
+   /|\  |
+   / \  |
+       ==='''] 
+
+    print(hangman[len(missed_guess)])
+
+    print("Missed letters: ")
+    for letter in missed_guess:
+        print(letter)
+
+    censored = '_' * len(word_to_guess)
+    
+    for i in range(len(word_to_guess)): 
+        if word_to_guess[i] in correct_guess:
+            censored = censored[:i] + word_to_guess[i] + censored[i+1:]
+            for letter in censored: 
+                print(letter)
+
+
+def get_user_guess(guessed):
+    while True:
+        guess = input("Enter your guess (letter): ")
+        guess = guess.lower()
+        if len(guess) != 1:
+            print("Please enter only a single letter.")
+
+        elif guess in guessed:
+            print("You have already made this guess. Guess again.")
+            guess = input("Enter your guess (letter): ")
+
+        elif guess not in ["a", "b", "c", "d", "e", 'f', "g", "h", 
+                           "i", "j", "k", "l", "m", "n", "o","p", 
+                           "q", "r","s", "t", "u", "v", "w", "x", 
+                           "y", "z"]:
+            print("Please enter a letter from the alphabet.")
+        else: 
+            return guess
+
+def main():
+    print("THE HANGMAN GAME")
+    word_to_guess = "mississippi"
+    missed_guess = ""
+    correct_guess = ""
+    while True:
+        play_board(missed_guess, correct_guess, word_to_guess)
+        guess = get_user_guess(missed_guess + correct_guess)
+
+        if guess in word_to_guess:
+            correct_guess = correct_guess + guess
+
+            user_win = True
+            for i in range(len(word_to_guess)):
+                if word_to_guess[i] not in correct_guess:
+                    user_win = False
+                    break
+
+            if user_win:
+                print("The secret word is ", word_to_guess, "Congratulation!")
+
+        else:
+            missed_guess = missed_guess + guess
+
+
+if __name__ == '__main__':
+    main()

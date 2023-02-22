@@ -1,0 +1,150 @@
+# lab 18
+# CS 170 - Tran Ha Linh Tang
+
+import random
+
+def make_play_grid(width, height):
+    '''
+    Produce a list of lists to print out grid
+    
+    Parameters:
+        width: [int] number of element in a list
+        height: [int] number of lists in the main list
+
+    Return:
+        grid: [list] list of what to print grid
+    '''
+
+    grid = []
+
+    for i in range(height):
+        grid.append(["_"] * width)
+        grid[0][i] = "Y"
+        grid[-1][i] = "Y"
+
+    for i in range(width): 
+        grid[i][0] = "Y"
+        grid[i][-1] = "Y"
+
+    return grid
+    
+def print_grid(grid):
+    '''
+    Print grid
+
+    Parameter:
+        grid: [list] list of what to print grid
+
+    Return: none
+    '''
+
+    for row in grid:
+        print("".join(row))
+
+def move_player(direction, x, y, l):
+    """
+    Move player/Change player's position in grid
+
+    Parameters:
+        direction: [str] a string input to determine player's moving direction
+        x: [int] index of inside list (that represents player's position in width)
+        y: [int] index of outside list (that represents player's position in height)
+        l: [list] grid
+
+    Return: 
+        x: [int] index of inside list (that represents position in width)
+        y: [int] index of outside list (that represents position in height)
+    """
+
+    # wasd
+    if direction.lower() == "w":
+        y += 1
+    if direction.lower() == "a":
+        x -= 1
+    if direction.lower() == "s":
+        y -= 1
+    if direction.lower() == "d":
+        x += 1
+
+    l[y][x] = "I"
+
+    return x, y
+
+def move_wumpus(w_x, w_y, p_x, p_y, l):
+     """
+    Move wumpusr/Change wumpus's position in grid to follow player
+
+    Parameters:
+        w_x: [int] index of inside list (that represents wumpus's position in width)
+        w_y: [int] index of outside list (that represents wumpus's position in height)
+        p_x: [int] index of inside list (that represents player's position in width)
+        p_y: [int] index of outside list (that represents player's position in height)
+        l: [list] grid
+
+    Return: 
+        w_x: [int] index of inside list (that represents wumpus's position in width)
+        w_y: [int] index of outside list (that represents wumpus's position in height)
+    """
+    
+    if abs(w_y - p_y) == 0 or abs(w_x - p_x) <= abs(w_y - p_y):
+        if w_x < p_x:
+            w_x += 1
+        if w_x > p_x:
+            w_x -= 1       
+    else:
+        if w_y < p_y:
+            w_y += 1
+        if w_y > p_y:
+            w_y -= 1
+    l[w_y][w_x] = "W"
+
+    return w_x, w_y
+
+
+def main():
+    # set player's position and make play grid
+    p_x = 1
+    p_y = 1
+    grid = make_play_grid(10, 15)
+    grid[1][1] = "I"
+
+    # generate treasure's position ramdomly
+    t_x = random.randint(1, len(grid[0]) - 2)
+    t_y = random.randint(1, len(grid) - 2)
+    grid[t_y][t_x] = "$"
+
+    # generate wumpus's position ramdomly but not on treasure
+    w_x = random.randint(1, len(grid[0]) - 2)
+    w_y = random.randint(1, len(grid) - 2)
+    if w_x == t_x and w_y == t_y:
+        w_x = random.randint(1, len(grid[0]) - 2)
+        w_y = random.randint(1, len(grid) - 2)
+    grid[w_y][w_x] = "W"
+
+    move = input()
+
+    while grid[t_y][t_x] != "I": 
+        old_p_x = p_x
+        old_p_y = p_y
+        grid[old_p_y][old_p_x] = "_"
+        p_x, p_y = move_player(move, p_x, p_y, grid)
+        grid[p_y][p_x] = "I" 
+        print(p_x, p_y)
+
+        grid[w_y][w_x] = "_"
+        w_x, w_y = move_wumpus(w_x, w_y, p_x, p_y, grid)
+        grid[w_y][w_x] = "W"
+        print(w_x, w_y)
+        
+        print_grid(grid)    
+
+        if p_x == w_x and p_y == w_y:
+            print("GAME OVER")
+            break
+        else: 
+            move = input()
+
+        if p_x == t_x and p_y == t_y:
+            print("Congratulations! You won!")
+            break
+    
